@@ -36,22 +36,26 @@ const scrapingProfile = async () => {
         break;
       }
 
-      await wait(150)
+      await wait(150);
       window.scrollBy(0, window.innerHeight/5);
     }
+
+    return new Promise((resolve) => {
+      resolve();
+    });
   }
 
   const summaryProfile = document.querySelector('section.pv-top-card ul.pv-top-card--list').parentElement;
   const name = summaryProfile.querySelector('ul.pv-top-card--list li').innerText;
   const title = summaryProfile.querySelector('h2').innerText;
   const location = summaryProfile.querySelectorAll('ul.pv-top-card--list')[1]?.querySelector('li')?.innerText;
-  wait(2000);
+  
+  await wait(2000);
   const elementMoreResume = document.querySelector('#line-clamp-show-more-button');
   if (elementMoreResume) elementMoreResume.click();
   const elementResume = document.querySelector('section.pv-about-section p.pv-about__summary-text');
   const resume = elementResume.innerText;
 
-  const profileDetail = document.querySelector('div.profile-detail');
   await autoscrollToElement('div.profile-detail');
 
   let experienceDOM = document.querySelector('section.experience-section')
@@ -60,8 +64,10 @@ const scrapingProfile = async () => {
   experienceList.forEach(x => {
     if (x.querySelector('ul') != null) {
       let companyDetails = x.querySelector('div.pv-entity__company-details');
-      x.querySelectorAll('li.pv-entity__position-group-role-item').forEach(y => {
-        y.querySelector('button.inline-show-more-text__button')?.click();
+      x.querySelectorAll('div.pv-entity__role-details').forEach(y => {
+        if (y.querySelector('button.inline-show-more-text__button')?.innerText == 'ver más') {
+          y.querySelector('button.inline-show-more-text__button')?.click();
+        }
         let element = y.querySelector('h3').parentElement;
         experience.push({
           "job": element.querySelector('h3')?.querySelector('span:not(.visually-hidden)')?.innerText,
@@ -73,7 +79,9 @@ const scrapingProfile = async () => {
       });
     }
     else {
-      x.querySelector('button.inline-show-more-text__button')?.click();
+      if (x.querySelector('button.inline-show-more-text__button')?.innerText == 'ver más') {
+        x.querySelector('button.inline-show-more-text__button')?.click();
+      }
       let element = x.querySelector('h3').parentElement;
       experience.push({
         "job": element.querySelector('h3')?.innerText,
